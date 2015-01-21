@@ -24,11 +24,25 @@
         .factory('$Tell', [
             '$$tellEventMgr',
             function (EventManager) {
-                function message(id, event, params) {
-                    EventManager.scope(id).$broadcast(event, params);
+                function downwards(id, event, params) {
+                    EventManager.scope(id) && EventManager.scope(id).$broadcast(event, params);
                 }
 
-                return message;
+                function upwards(id, event, params) {
+                    EventManager.scope(id) && EventManager.scope(id).$emit(event, params);
+                }
+
+                var messaging = {
+                    children: downwards,
+                    parents: upwards,
+                    downwards: downwards,
+                    upwards: upwards,
+                    trigger: downwards,
+                    bubble: upwards,
+                    capture: downwards
+                };
+
+                return messaging;
             }
         ])
         .directive('ngTell', [
